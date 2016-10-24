@@ -2,6 +2,7 @@ package services
 
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject._
+import models.Airport
 
 /**
  * This class is a concrete implementation of the [[Counter]] trait.
@@ -14,7 +15,15 @@ import javax.inject._
  * injected.
  */
 @Singleton
-class DataService @Inject() (airports: AirportsData) {
+class DataService @Inject() (environment: play.api.Environment, configuration: play.api.Configuration) {
+  val airports = new AirportsData(environment.getFile("conf/resources/airports.csv"))
+  val runways = new AirportsData(environment.getFile("conf/resources/runways.csv"))
+
   private val atomicCounter = new AtomicInteger()
   def nextCount(): Int = atomicCounter.getAndIncrement()
+  def getRunwaysNumber() : Int = runways.getFileSize
+  def getAirportsNumber() : Int = airports.getFileSize
+  def queryAirports(country: String) : List[Airport] = {
+    airports.listAirports(country)
+  }
 }
