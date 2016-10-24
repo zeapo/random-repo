@@ -20,8 +20,7 @@ class AssessController @Inject() (data: DataService) extends Controller {
    * a path of `/`.
    */
   def index = Action {
-    Ok(views.html.index(s"""Data count check : ${data.nextCount()}
-                            airports : ${data.getAirportsNumber} runways : ${data.getRunwaysNumber};;"""))
+    Ok(views.html.index(s"""Data count check : ${data.nextCount()}"""))
   }
 
   def queryAirports(iso_country: String) = Action { request =>

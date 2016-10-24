@@ -16,14 +16,13 @@ import models.Airport
  */
 @Singleton
 class DataService @Inject() (environment: play.api.Environment, configuration: play.api.Configuration) {
-  val airports = new AirportsData(environment.getFile("conf/resources/airports.csv"))
-  val runways = new AirportsData(environment.getFile("conf/resources/runways.csv"))
+  val runwaysData = new RunwaysData(environment.getFile("conf/resources/runways.csv"))
+  val airportsData = new AirportsData(environment.getFile("conf/resources/airports.csv"), runwaysData)
 
   private val atomicCounter = new AtomicInteger()
   def nextCount(): Int = atomicCounter.getAndIncrement()
-  def getRunwaysNumber() : Int = runways.getFileSize
-  def getAirportsNumber() : Int = airports.getFileSize
   def queryAirports(country: String) : List[Airport] = {
-    airports.listAirports(country)
+    val airports = airportsData.listAirports(country)
+    airports.map(airport => airport.copy(runways = runwaysData.listRunways(airport.id)))
   }
 }
