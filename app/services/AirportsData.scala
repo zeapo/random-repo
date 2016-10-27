@@ -11,7 +11,7 @@ import models.Airport
   */
 class AirportsData(dataFile: File, runwaysData: RunwaysData) {
   val reader = CSVReader.open(dataFile)
-  // initialize the aiport data; each airport with all its runways
+  // initialize the airport data; each airport with all its runways
   val data : List[Airport] = reader.allWithHeaders().map(row => {
                                                            val airportId = row.get("id").get
                                                            val runways = runwaysData.listRunways(airportId)
@@ -27,5 +27,9 @@ class AirportsData(dataFile: File, runwaysData: RunwaysData) {
     */
   def listAirports(country: String) = {
     data.filter(airport => airport.iso_country.equals(country))
+  }
+
+  def listAirpotsByCountry() : Array[(String, List[Airport])] = {
+    data.groupBy(airport => airport.iso_country).toArray.sortWith(_._2.size > _._2.size)
   }
 }

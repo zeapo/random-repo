@@ -3,6 +3,7 @@ package services
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject._
 import models.Airport
+import scala.collection.immutable.ListMap
 
 /**
  * This class is a concrete implementation of the [[Counter]] trait.
@@ -20,9 +21,17 @@ class DataService @Inject() (environment: play.api.Environment, configuration: p
   val airportsData = new AirportsData(environment.getFile("conf/resources/airports.csv"), runwaysData)
 
   private val atomicCounter = new AtomicInteger()
+
   def nextCount(): Int = atomicCounter.getAndIncrement()
+
   def queryAirports(country: String) : List[Airport] = {
     val airports = airportsData.listAirports(country)
     airports.map(airport => airport.copy(runways = runwaysData.listRunways(airport.id)))
+  }
+
+  def queryCountries(nb: Int = 10) = {
+    val airports = airportsData.listAirpotsByCountry
+    Tuple2(airports.take(nb).map { case (country, airports) => (country, airports.size) },
+           airports.takeRight(nb).map { case (country, airports) => (country, airports.size) })
   }
 }
